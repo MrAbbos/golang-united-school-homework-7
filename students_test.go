@@ -21,11 +21,16 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
+const typeError = "Expected %t , got %t"
+
+
 func TestLen(t *testing.T){
-	var people = People{Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() }}
-	people = append(people,Person{firstName:"Serg",lastName:"Kolod",birthDay: time.Now() })
+	var people = People{
+		{firstName:"Mirabbos",lastName:"Botirjonov",birthDay: time.Now() },
+		{firstName:"Abbos",lastName:"Abbosov",birthDay: time.Now() },
+	}
 	result :=people.Len()
-	expected := 2
+	expected := len(people)
 
 	if result!=expected{
 		t.Errorf("Expected %d , got %d",expected,result)
@@ -34,48 +39,48 @@ func TestLen(t *testing.T){
 
 func TestLessBirthDay(t *testing.T){
 	var people = People{
-		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
-		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now().AddDate(1,1,1)},
+		{firstName:"Mirabbos",lastName:"Botirjonov",birthDay: time.Now() },
+		{firstName:"Abbos",lastName:"Abbosov",birthDay: time.Now().AddDate(1,1,1)},
 	}
 	result :=people.Less(0,1)
 	expected := false
 	if result!=expected{
-		t.Errorf("Expected %t , got %t",expected,result)
+		t.Errorf(typeError,expected,result)
 	}
 }
 
 func TestLessLastName(t *testing.T){
 	var people = People{
-		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
-		Person{firstName:"Petro",lastName:"Sirko",birthDay: time.Now()},
+		{firstName:"Mirabbos",lastName:"Botirjonov",birthDay: time.Now() },
+		{firstName:"Mirabbos",lastName:"dAbbosov",birthDay: time.Now()},
 	}
 	result :=people.Less(0,1)
 	expected := true
 	if result!=expected{
-		t.Errorf("Expected %t , got %t",expected,result)
+		t.Errorf(typeError,expected,result)
 	}
 }
 
 func TestLessFirstName(t *testing.T){
 	var people = People{
-		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
-		Person{firstName:"Ivan",lastName:"Bullet",birthDay: time.Now()},
+		{firstName:"Mirabbos",lastName:"Botirjonov",birthDay: time.Now() },
+		{firstName:"Abbos",lastName:"Abbosov",birthDay: time.Now()},
 	}
 	result :=people.Less(0,1)
 	expected := false
 	if result!=expected{
-		t.Errorf("Expected %t , got %t",expected,result)
+		t.Errorf(typeError,expected,result)
 	}
 }
 
 func TestSwap(t *testing.T){
 	var people = People{
-		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
-		Person{firstName:"Ivan",lastName:"Bullet",birthDay: time.Now()},
+		{firstName:"Mirabbos",lastName:"Botirjonov",birthDay: time.Now() },
+		{firstName:"Abbos",lastName:"Botirjonov",birthDay: time.Now()},
 	}
 	people.Swap(0,1)
 	
-	if people[0].firstName!="Ivan" || people[1].firstName!="Petro"{
+	if people[0].firstName!="Abbos" || people[1].firstName!="Mirabbos"{
 		t.Errorf("Swap error %s",people[0].firstName)
 	}
 }
@@ -97,27 +102,15 @@ func TestNew(t *testing.T) {
 
 }
 
-func TestNew2(t *testing.T) {
+func TestRows(t *testing.T) {
+	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}
+	rows:= m.Rows()
+	expected:=[][]int{{1 ,2},{3,4}, {5, 6}}
 
-	_,err := New("x\n2\n3\n4\n5\n6")
-
-	if err==nil{
-		t.Error("Must be an Error in New procedure ")
+	if !reflect.DeepEqual(expected,rows){
+		t.Error("Rows not equals")	
 	}
-
 }
-
-func TestNew3(t *testing.T) {
-
-	_,err := New("1 2\n3 4\n5")
-
-	if err==nil{
-		t.Error("Must be an Error in New procedure ")
-	}
-
-}
-
-
 func TestCols(t *testing.T) {
 
 	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}
@@ -131,15 +124,6 @@ func TestCols(t *testing.T) {
 
 }
 
-func TestRows(t *testing.T) {
-	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}
-	rows:= m.Rows()
-	expected:=[][]int{{1 ,2},{3,4}, {5, 6}}
-
-	if !reflect.DeepEqual(expected,rows){
-		t.Error("Rows not equals")	
-	}
-}
 
 func TestSet(t *testing.T) {
 	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}	
