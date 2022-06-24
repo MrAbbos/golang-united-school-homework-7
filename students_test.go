@@ -2,6 +2,7 @@ package coverage
 
 import (
 	"os"
+	"reflect"
 	"time"
 	"testing"
 )
@@ -20,116 +21,141 @@ func init() {
 
 // WRITE YOUR CODE BELOW
 
-const (
-	stringErrorFormat  = "Expected: %s, got %s"
-	intErrorFormat     = "Expected: %d, got %d"
-	valueErrorFormat = "Expected: %v, got %v"
-)
+func TestLen(t *testing.T){
+	var people = People{Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() }}
+	people = append(people,Person{firstName:"Serg",lastName:"Kolod",birthDay: time.Now() })
+	result :=people.Len()
+	expected := 2
 
-func prepareTestData() People {
-	var peopleCollection People
-	var timeStamp = time.UTC
-	peopleCollection = append(peopleCollection, Person{
-		"Abbos",
-		"Abbosov",
-		time.Date(2002, time.July, 21, 5, 8, 0, 0, timeStamp),
-	})
-
-	peopleCollection = append(peopleCollection, Person{
-		"Ivan",
-		"Ivanov",
-		time.Date(2004, time.March, 28, 12, 21, 12, 21, timeStamp),
-	})
-	peopleCollection = append(peopleCollection, Person{
-		"Alijon",
-		"Alijonov",
-		time.Date(2000, time.March, 2, 2, 0, 0, 0, timeStamp),
-	})
-	peopleCollection = append(peopleCollection, Person{
-		"Kimdir",
-		"Kimdirovich",
-		time.Date(2000, time.January, 1, 1, 1, 1, 1, timeStamp),
-	})
-	peopleCollection = append(peopleCollection, Person{
-		"Usha",
-		"Ushov",
-		time.Date(2022, time.February, 1, 2, 3, 4, 5, timeStamp),
-	})
-	peopleCollection = append(peopleCollection, Person{
-		"Karochi",
-		"Karochov",
-		time.Date(2002, time.January, 2, 0, 0, 2, 0, timeStamp),
-	})
-	return peopleCollection
-}
-
-func TestLenFunctionIsEmpty(t *testing.T) {
-	var people People
-	var expected = 0
-	var actual = people.Len()
-	if expected != actual {
-		t.Errorf(intErrorFormat, expected, actual)
+	if result!=expected{
+		t.Errorf("Expected %d , got %d",expected,result)
 	}
 }
 
-func TestLenFunctionIsNotEmpty(t *testing.T) {
-	var people = prepareTestData()
-	var expected = 7
-	var actual = people.Len()
-	if expected != actual {
-		t.Errorf(intErrorFormat, expected, actual)
+func TestLessBirthDay(t *testing.T){
+	var people = People{
+		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
+		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now().AddDate(1,1,1)},
+	}
+	result :=people.Less(0,1)
+	expected := false
+	if result!=expected{
+		t.Errorf("Expected %t , got %t",expected,result)
 	}
 }
 
-func TestLessFunction(t *testing.T) {
-	tData := []struct {
-		I        int
-		J        int
-		Expected bool
-	}{
-		{I: 1, J: 2, Expected: true},  
-		{I: 1, J: 0, Expected: true},  
-		{I: 4, J: 3, Expected: false}, 
-		{I: 3, J: 4, Expected: true},  
-		{I: 4, J: 5, Expected: false}, 
-		{I: 5, J: 4, Expected: true},  
-		{I: 5, J: 6, Expected: false}, 
-		{I: 5, J: 5, Expected: false}, 
+func TestLessLastName(t *testing.T){
+	var people = People{
+		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
+		Person{firstName:"Petro",lastName:"Sirko",birthDay: time.Now()},
 	}
-	var people = prepareTestData()
-	for _, v := range tData {
-		var actual = people.Less(v.I, v.J)
-		if v.Expected != actual {
-			t.Errorf(valueErrorFormat, v.Expected, actual)
-		}
+	result :=people.Less(0,1)
+	expected := true
+	if result!=expected{
+		t.Errorf("Expected %t , got %t",expected,result)
 	}
 }
 
-func TestSwapFunction(t *testing.T) {
-	tData := []struct {
-		FirstIndex  int
-		SecondIndex int
-	}{
-		{FirstIndex: 0, SecondIndex: 3},
-		{FirstIndex: 3, SecondIndex: 3},
-		{FirstIndex: 5, SecondIndex: 0},
+func TestLessFirstName(t *testing.T){
+	var people = People{
+		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
+		Person{firstName:"Ivan",lastName:"Bullet",birthDay: time.Now()},
 	}
-	for _, v := range tData {
-		var people = prepareTestData()
-		var originalCollection = prepareTestData()
+	result :=people.Less(0,1)
+	expected := false
+	if result!=expected{
+		t.Errorf("Expected %t , got %t",expected,result)
+	}
+}
 
-		people.Swap(v.FirstIndex, v.SecondIndex)
+func TestSwap(t *testing.T){
+	var people = People{
+		Person{firstName:"Petro",lastName:"Bullet",birthDay: time.Now() },
+		Person{firstName:"Ivan",lastName:"Bullet",birthDay: time.Now()},
+	}
+	people.Swap(0,1)
+	
+	if people[0].firstName!="Ivan" || people[1].firstName!="Petro"{
+		t.Errorf("Swap error %s",people[0].firstName)
+	}
+}
 
-		var expected = originalCollection[v.SecondIndex].firstName
-		var actual = people[v.FirstIndex].firstName
 
-		if actual != expected {
-			t.Errorf(stringErrorFormat, expected, actual)
-		}
-		expected = originalCollection[v.FirstIndex].firstName
-		actual = people[v.SecondIndex].firstName
-		if actual != expected {
-			t.Errorf(stringErrorFormat, expected, actual)
-		}
+func TestNew(t *testing.T) {
+
+	matrix,err := New("1\n2\n3\n4\n5\n6")
+	expected:=Matrix{6 ,1 ,[]int{1 ,2, 3, 4, 5, 6}}
+
+
+	if err!=nil{
+		t.Errorf("Error in New procedure %s",err.Error())
+	}
+
+	if !reflect.DeepEqual(expected,*matrix){
+		t.Error("Matrix not equals ")
+	}
+
+}
+
+func TestNew2(t *testing.T) {
+
+	_,err := New("x\n2\n3\n4\n5\n6")
+
+	if err==nil{
+		t.Error("Must be an Error in New procedure ")
+	}
+
+}
+
+func TestNew3(t *testing.T) {
+
+	_,err := New("1 2\n3 4\n5")
+
+	if err==nil{
+		t.Error("Must be an Error in New procedure ")
+	}
+
+}
+
+
+func TestCols(t *testing.T) {
+
+	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}
+	cols:= m.Cols()
+	expected:=[][]int{{1 ,3, 5}, {2 ,4, 6}}
+
+	if !reflect.DeepEqual(expected,cols){
+		t.Error("Colls not equals")	
+	}
+
+
+}
+
+func TestRows(t *testing.T) {
+	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}
+	rows:= m.Rows()
+	expected:=[][]int{{1 ,2},{3,4}, {5, 6}}
+
+	if !reflect.DeepEqual(expected,rows){
+		t.Error("Rows not equals")	
+	}
+}
+
+func TestSet(t *testing.T) {
+	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}	
+	set_result:= m.Set(1,1,9)
+	expected:=Matrix{3 ,2 ,[]int{1 ,2, 3, 9, 5, 6}}
+
+	if (!reflect.DeepEqual(expected,m))||set_result==false{
+		t.Error("Values not equals")	
+	}
+}
+
+func TestSetOverflow(t *testing.T) {
+	m:= Matrix{3 ,2 ,[]int{1 ,2, 3, 4, 5, 6}}	
+	set_result:= m.Set(1,2,9)
+	
+	if set_result==true{
+		t.Error("Set result must be false")	
 	}
 }
